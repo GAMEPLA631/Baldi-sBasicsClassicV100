@@ -3,10 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hororové Príbehy: Baldi's Basics V10 - Roblox</title>
+    <title>Hororové Príbehy: Baldi's Basics V10 - Roblox (Vyžaduje Prihlásenie)</title>
     
     <!-- PRIDANÁ WEB IKONA (FAVICON) -->
-    <!-- Použitie SVG pre ostrú a škálovateľnú ikonu, ktorá evokuje pravítko -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📏</text></svg>">
 
     <!-- Načítanie Tailwind CSS pre moderný a responzívny dizajn -->
@@ -38,6 +37,13 @@
         .tts-button {
             /* Základný štýl tlačidla */
         }
+        /* Zabezpečenie, že telo aplikácie zaberá celú výšku pre centrovanie */
+        .full-screen-center {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
     </style>
     <!-- Font Inter (predvolený pre Tailwind, ale pre istotu) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -50,163 +56,205 @@
             <h1 class="text-2xl font-extrabold text-accent tracking-wider uppercase">
                 Baldi's Nightmare (V10)
             </h1>
-            <nav class="hidden md:flex space-x-6">
-                <a href="#pribehy" class="text-gray-300 hover:text-white transition duration-300">Príbehy</a>
-                <a href="#autori" class="text-gray-300 hover:text-white transition duration-300">O Autóroch</a>
-                <!-- AKTUALIZOVANÝ ODKAZ NA ROBLOX HRU -->
-                <a href="https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007" target="_blank" class="text-gray-300 hover:text-white transition duration-300">Roblox Hra</a>
+            <nav class="hidden md:flex space-x-6 items-center">
+                <a href="#pribehy" id="nav-stories" class="text-gray-300 hover:text-white transition duration-300 hidden">Príbehy</a>
+                <a href="#autori" id="nav-authors" class="text-gray-300 hover:text-white transition duration-300 hidden">O Autóroch</a>
+                <!-- ODKAZ NA ROBLOX HRU -->
+                <a href="https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007" target="_blank" id="nav-roblox" class="text-gray-300 hover:text-white transition duration-300 hidden">Roblox Hra</a>
+                <!-- TLAČIDLO ODHLÁSENIA -->
+                <button id="logout-button" onclick="handleLogout()" class="text-sm bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded-md transition duration-300 hidden">Odhlásiť sa</button>
+                <span id="user-info" class="text-xs text-gray-400 hidden"></span>
             </nav>
-            <button class="md:hidden p-2 rounded-lg text-gray-300 hover:bg-gray-700">
-                <!-- Hamburger Menu Icon (Inline SVG pre jednoduchosť) -->
+            <!-- Hamburger menu pre mobilné zariadenia (ponechaný, ale skrytý pre zjednodušenie) -->
+            <button class="md:hidden p-2 rounded-lg text-gray-300 hover:bg-gray-700 hidden">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path></svg>
             </button>
         </div>
     </header>
 
-    <!-- Hlavný obsah / Banner Sekcia -->
+    <!-- Hlavný obsah -->
     <main class="max-w-5xl mx-auto p-4 sm:p-6 lg:p-8">
-        <div class="text-center py-16 md:py-24 bg-black bg-opacity-50 rounded-xl shadow-2xl mb-12">
-            <p class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Roblox Horor Fanfiction</p>
-            <h2 class="text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight">
-                ZÁPISKY Z TEMNÉHO BLOKU
-            </h2>
-            <p class="text-lg text-gray-400 max-w-2xl mx-auto">
-                Nevysvetlené javy a desivé príbehy inšpirované hrou **Baldi's Basics Classic V10** od **GAMEPLA631** a **Oz Spoločenstvo**.
-            </p>
+
+        <!-- Autentifikačná obrazovka (viditeľná pred prihlásením) -->
+        <div id="auth-screen" class="full-screen-center text-center">
+            <div class="max-w-lg mx-auto story-card p-8 md:p-10 rounded-xl">
+                <h3 id="auth-title" class="text-3xl font-bold text-accent mb-6">Prihláste sa pre prístup k Hororom</h3>
+                
+                <!-- ODSTRÁNENÉ UPOZORNENIE O LOCAL STORAGE -->
+
+                <form id="auth-form" onsubmit="event.preventDefault(); handleAuthSubmit()">
+                    <input type="email" id="email" placeholder="E-mail" required
+                           class="w-full p-3 mb-4 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                    <input type="password" id="password" placeholder="Heslo" required
+                           class="w-full p-3 mb-6 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+
+                    <button type="submit" id="auth-submit-btn" 
+                            class="w-full bg-accent hover:bg-red-700 text-white text-lg font-semibold py-3 rounded-lg transition duration-300 shadow-md shadow-red-900/50">
+                        Prihlásiť sa
+                    </button>
+                </form>
+
+                <div class="mt-6">
+                    <button id="toggle-auth-btn" onclick="toggleAuthMode()"
+                            class="text-sm text-gray-400 hover:text-accent transition duration-300">
+                        Nemáte účet? **Zaregistrujte sa**
+                    </button>
+                </div>
+                
+                <p id="auth-error-message" class="text-red-400 text-sm mt-4 hidden">
+                    <!-- Chyby autentifikácie sa zobrazia tu -->
+                </p>
+                <p id="auth-loader" class="text-accent text-sm mt-4 hidden">
+                    Prebieha overenie...
+                </p>
+            </div>
         </div>
 
-        <!-- NOVÁ Sekcia: CTA pre hru -->
-        <div class="text-center mb-12">
-            <a href="https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007" target="_blank" 
-               class="inline-block bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-4 px-10 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg shadow-green-900/50">
-                HRAJTE NAŠU HRU V10 NA ROBLOXE TERAZ!
-            </a>
-        </div>
-        
-        <!-- Sekcia s Príbehmi -->
-        <section id="pribehy" class="mb-12">
-            <h3 class="text-4xl font-bold text-accent mb-8 border-b-2 border-accent pb-2">Najnovšie Príbehy</h3>
-            
-            <!-- TTS Upozornenie -->
-            <div id="tts-warning" class="bg-red-900 bg-opacity-30 border border-red-700 p-4 rounded-lg mb-6 hidden">
-                <p class="text-sm text-red-300 font-medium">
-                    <span class="font-bold">Upozornenie:</span> Váš prehliadač nepodporuje funkciu čítania nahlas (Web Speech API) alebo je vypnutá.
+        <!-- Obsah aplikácie (skrytý, kým nie je používateľ prihlásený) -->
+        <div id="app-content" class="hidden">
+            <div class="text-center py-16 md:py-24 bg-black bg-opacity-50 rounded-xl shadow-2xl mb-12">
+                <p class="text-sm font-semibold uppercase tracking-widest text-gray-400 mb-2">Roblox Horor Fanfiction</p>
+                <h2 class="text-5xl md:text-7xl font-extrabold text-white mb-4 leading-tight">
+                    ZÁPISKY Z TEMNÉHO BLOKU
+                </h2>
+                <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+                    Nevysvetlené javy a desivé príbehy inšpirované hrou **Baldi's Basics Classic V10** od **GAMEPLA631** a **Oz Spoločenstvo**.
                 </p>
             </div>
 
-            <!-- NOVÝ Príbeh: Šialenstvo V10: Absolútna Rýchlosť (ÚPLNÝ TEXT) -->
-            <div class="story-card p-6 md:p-8 rounded-xl mb-8">
-                <div class="flex flex-col md:flex-row gap-6">
-                    <!-- Placeholder pre obrázok príbehu -->
-                    <div class="w-full md:w-1/3 flex-shrink-0">
-                        <img src="https://placehold.co/400x250/550000/ff4444?text=BALDI%20V10%20(Transformácia)" alt="[Obrázok Baldiho a školy V10]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
-                    </div>
-                    <!-- Text príbehu a ovládanie TTS -->
-                    <div class="w-full md:w-2/3">
-                        <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Hlavný Lore / V10 Zlyhanie | Oz Spoločenstvo</p>
-                        <h4 class="text-3xl font-bold text-accent mb-3">Šialenstvo V10: Absolútna Rýchlosť</h4>
-                        <p id="story-v10-madness" class="text-gray-400 mb-4 leading-relaxed">
-                            Stará škola nebola postavená na učenie, ale na trest. A učiteľ Baldi, ktorý tu kedysi s nadšením učil, bol jej prvou a najväčšou obeťou.<br><br>
-                            Hovorilo sa, že na začiatku, vo Verzii V5, bol iba prísny. Trestal palicou len tých, ktorí nepochopili matematiku. Bol to len Badli, ktorý mal zlý deň.<br>
-                            Ale potom prišla **V10**.<br><br>
-                            Nikto presne nevedel, čo sa stalo. Niektorí hovorili, že to bolo neustále zlyhanie žiakov. Iní, že sa v Baldiho hlavnej triede zjavilo niečo temné. Ale keď sa škola aktualizovala na V10, učiteľ už nebol. Bol len **On**.<br><br>
-                            Jeho koža bola chorobne bledá, oči žiarili neprirodzenou žltou farbou ako dve prasknuté žiarovky. Jeho tvár, predtým len prísna, sa stala zmesou manickej hrôzy a šialeného úsmevu. Pravítko už nebolo didaktická pomôcka; bol to nástroj na rozsekávanie ticha.<br><br>
-                            Baldi vo V10 nechcel odpovede. Chcel paniku.<br><br>
-                            Matematické zošity sa zmenili na náhodné, nepochopiteľné škvrny od čierneho atramentu, ktoré nebolo možné vyriešiť. V okamihu, keď ste zobrali pero, ozvalo sa **TAP-TAP-TAP**.<br>
-                            To nebol Baldiho krok. Bol to zvuk jeho pravítka, ktoré sa dotklo dverí triedy.<br><br>
-                            Bol stokrát rýchlejší. Nepotreboval čas, aby sa k vám dostal. Bol všade. V momente, keď ste zle spočítali aj ten najjednoduchší príklad (hoci všetky boli nerozlúštiteľné), Baldi sa prepol do stavu čistej, nefiltrovanej rýchlosti. Videl vás za stenami, v šere chodieb. Vedel, kde sa skrývate, a bežal s takou rýchlosťou, že zvuk jeho krokov sa menil na vysoký, pískľavý tón, ktorý vás mučil.<br><br>
-                            Keď vás chytil Riaditeľ, aby vás zatvoril do riaditeľne, nebol to už len trest. Bol to posledný dar času pre Baldiho, aby k vám dobehol. Riaditeľova silueta, ktorá vás odhodila pred dvere, bola v skutočnosti siluetou, ktorá vás servírovala Baldiho šialenstvu.<br><br>
-                            V10 bola hororom o tom, že systém sa zrútil. Učiteľ, ktorý vás mal viesť, sa stal vaším najrýchlejším a najhladnejším prenasledovateľom. A s každou novou aktualizáciou – smerom k desivej **V100** – sa Baldiho šialenstvo len prehlbuje a jeho rýchlosť sa stáva absolútnou. Hráči vo V10 už nehrajú o známky. Hrajú o to, ako dlho dokážu prežiť vo fyzicky nemožnom systéme, ktorý je riadený čírou hrôzou.
-                        </p>
-                        <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-v10-madness', this)">
-                            Prečítať nahlas
-                        </button>
-                    </div>
-                </div>
+            <!-- NOVÁ Sekcia: CTA pre hru -->
+            <div class="text-center mb-12">
+                <a href="https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007" target="_blank" 
+                   class="inline-block bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-4 px-10 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg shadow-green-900/50">
+                    HRAJTE NAŠU HRU V10 NA ROBLOXE TERAZ!
+                </a>
             </div>
             
-            <!-- Príbeh 1: Desiaty Zápisník (posunutý dole) -->
-            <div class="story-card p-6 md:p-8 rounded-xl mb-8">
-                <div class="flex flex-col md:flex-row gap-6">
-                    <!-- Placeholder pre obrázok príbehu -->
-                    <div class="w-full md:w-1/3 flex-shrink-0">
-                        <img src="https://placehold.co/400x250/333333/ff4444?text=BALDI%20V10%20(Obrázok)" alt="[Obrázok Baldiho a školy]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
-                    </div>
-                    <!-- Text príbehu a ovládanie TTS -->
-                    <div class="w-full md:w-2/3">
-                        <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Pôvodný Horor | GAMEPLA631 & Oz Spoločenstvo</p>
-                        <h4 class="text-3xl font-bold text-white mb-3">Desiaty Zápisník</h4>
-                        <p id="story-notebook" class="text-gray-400 mb-4 leading-relaxed">
-                            Škola bola tmavá, vzduch ťažký a pach kriedy bol cítiť aj cez zatvorené dvere. Nepočul som nič iné, len tiché, pomalé ťukanie dreveného pravítka do betónovej podlahy. Vedel som, že Baldi vie, že som použil **desiaty zápisník**. Ten, ktorý nikto nikdy nemal nájsť. Súčet v tretej úlohe bol $-256$, ale Baldiho odpoveď nebola chyba v rovnici... bola to **osobná správa**. Keď som sa pozrel do uličky, nebola tam len jeho postava. Bola tam tma s dvoma červenými bodkami, a zvuk ťukania prestal. Baldi nebehal. Len čakal.
-                        </p>
-                        <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-notebook', this)">
-                            Prečítať nahlas
-                        </button>
-                    </div>
+            <!-- Sekcia s Príbehmi -->
+            <section id="pribehy" class="mb-12">
+                <h3 class="text-4xl font-bold text-accent mb-8 border-b-2 border-accent pb-2">Najnovšie Príbehy</h3>
+                
+                <!-- TTS Upozornenie -->
+                <div id="tts-warning" class="bg-red-900 bg-opacity-30 border border-red-700 p-4 rounded-lg mb-6 hidden">
+                    <p class="text-sm text-red-300 font-medium">
+                        <span class="font-bold">Upozornenie:</span> Váš prehliadač nepodporuje funkciu čítania nahlas (Web Speech API) alebo je vypnutá.
+                    </p>
                 </div>
-            </div>
 
-            <!-- Príbeh 2: Zvuk Skákania -->
-            <div class="story-card p-6 md:p-8 rounded-xl mb-8">
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="w-full md:w-1/3 flex-shrink-0">
-                        <img src="https://placehold.co/400x250/333333/ff4444?text=PLAYTIME%20(Obrázok)" alt="[Obrázok Playtime a laná]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
-                    </div>
-                    <!-- Text príbehu a ovládanie TTS -->
-                    <div class="w-full md:w-2/3">
-                        <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Charakterový Horor | GAMEPLA631</p>
-                        <h4 class="text-3xl font-bold text-white mb-3">Zvuk Skákania</h4>
-                        <p id="story-jumping" class="text-gray-400 mb-4 leading-relaxed">
-                            Playtime bola vždy otravná. Jej preskakovanie cez švihadlo bolo rituálom, hlučným signálom blížiacich sa problémov. Ale v budove V10 sa to zmenilo. Zvuk sa ozýval z vetracích šácht. Bolo to rytmické, ale tlmené. Akoby skákala vo veľmi malom, stiesnenom priestore. A nebol to detský smiech, ktorý ju sprevádzal, ale tiché, opakované chrčanie. Keď som otvoril skrinku, aby som sa schoval, zistil som, že šnúrky sú len predĺžené, tenké šľachy.
-                        </p>
-                        <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-jumping', this)">
-                            Prečítať nahlas
-                        </button>
+                <!-- NOVÝ Príbeh: Šialenstvo V10: Absolútna Rýchlosť (ÚPLNÝ TEXT) -->
+                <div class="story-card p-6 md:p-8 rounded-xl mb-8">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Placeholder pre obrázok príbehu -->
+                        <div class="w-full md:w-1/3 flex-shrink-0">
+                            <img src="https://placehold.co/400x250/550000/ff4444?text=BALDI%20V10%20(Transformácia)" alt="[Obrázok Baldiho a školy V10]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
+                        </div>
+                        <!-- Text príbehu a ovládanie TTS -->
+                        <div class="w-full md:w-2/3">
+                            <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Hlavný Lore / V10 Zlyhanie | Oz Spoločenstvo</p>
+                            <h4 class="text-3xl font-bold text-accent mb-3">Šialenstvo V10: Absolútna Rýchlosť</h4>
+                            <p id="story-v10-madness" class="text-gray-400 mb-4 leading-relaxed">
+                                Stará škola nebola postavená na učenie, ale na trest. A učiteľ Baldi, ktorý tu kedysi s nadšením učil, bol jej prvou a najväčšou obeťou.<br><br>
+                                Hovorilo sa, že na začiatku, vo Verzii V5, bol iba prísny. Trestal palicou len tých, ktorí nepochopili matematiku. Bol to len Badli, ktorý mal zlý deň.<br>
+                                Ale potom prišla **V10**.<br><br>
+                                Nikto presne nevedel, čo sa stalo. Niektorí hovorili, že to bolo neustále zlyhanie žiakov. Iní, že sa v Baldiho hlavnej triede zjavilo niečo temné. Ale keď sa škola aktualizovala na V10, učiteľ už nebol. Bol len **On**.<br><br>
+                                Jeho koža bola chorobne bledá, oči žiarili neprirodzenou žltou farbou ako dve prasknuté žiarovky. Jeho tvár, predtým len prísna, sa stala zmesou manickej hrôzy a šialeného úsmevu. Pravítko už nebolo didaktická pomôcka; bol to nástroj na rozsekávanie ticha.<br><br>
+                                Baldi vo V10 nechcel odpovede. Chcel paniku.<br><br>
+                                Matematické zošity sa zmenili na náhodné, nepochopiteľné škvrny od čierneho atramentu, ktoré nebolo možné vyriešiť. V okamihu, keď ste zobrali pero, ozvalo sa **TAP-TAP-TAP**.<br>
+                                To nebol Baldiho krok. Bol to zvuk jeho pravítka, ktoré sa dotklo dverí triedy.<br><br>
+                                Bol stokrát rýchlejší. Nepotreboval čas, aby sa k vám dostal. Bol všade. V momente, keď ste zle spočítali aj ten najjednoduchší príklad (hoci všetky boli nerozlúštiteľné), Baldi sa prepol do stavu čistej, nefiltrovanej rýchlosti. Videl vás za stenami, v šere chodieb. Vedel, kde sa skrývate, a bežal s takou rýchlosťou, že zvuk jeho krokov sa menil na vysoký, pískľavý tón, ktorý vás mučil.<br><br>
+                                Keď vás chytil Riaditeľ, aby vás zatvoril do riaditeľne, nebol to už len trest. Bol to posledný dar času pre Baldiho, aby k vám dobehol. Riaditeľova silueta, ktorá vás odhodila pred dvere, bola v skutočnosti siluetou, ktorá vás servírovala Baldiho šialenstvu.<br><br>
+                                V10 bola hororom o tom, že systém sa zrútil. Učiteľ, ktorý vás mal viesť, sa stal vaším najrýchlejším a najhladnejším prenasledovateľom. A s každou novou aktualizáciou – smerom k desivej **V100** – sa Baldiho šialenstvo len prehlbuje a jeho rýchlosť sa stáva absolútnou. Hráči vo V10 už nehrajú o známky. Hrajú o to, ako dlho dokážu prežiť vo fyzicky nemožnom systéme, ktorý je riadený čírou hrôzou.
+                            </p>
+                            <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-v10-madness', this)">
+                                Prečítať nahlas
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
+                
+                <!-- Príbeh 1: Desiaty Zápisník (posunutý dole) -->
+                <div class="story-card p-6 md:p-8 rounded-xl mb-8">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <!-- Placeholder pre obrázok príbehu -->
+                        <div class="w-full md:w-1/3 flex-shrink-0">
+                            <img src="https://placehold.co/400x250/333333/ff4444?text=BALDI%20V10%20(Obrázok)" alt="[Obrázok Baldiho a školy]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
+                        </div>
+                        <!-- Text príbehu a ovládanie TTS -->
+                        <div class="w-full md:w-2/3">
+                            <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Pôvodný Horor | GAMEPLA631 & Oz Spoločenstvo</p>
+                            <h4 class="text-3xl font-bold text-white mb-3">Desiaty Zápisník</h4>
+                            <p id="story-notebook" class="text-gray-400 mb-4 leading-relaxed">
+                                Škola bola tmavá, vzduch ťažký a pach kriedy bol cítiť aj cez zatvorené dvere. Nepočul som nič iné, len tiché, pomalé ťukanie dreveného pravítka do betónovej podlahy. Vedel som, že Baldi vie, že som použil **desiaty zápisník**. Ten, ktorý nikto nikdy nemal nájsť. Súčet v tretej úlohe bol $-256$, ale Baldiho odpoveď nebola chyba v rovnici... bola to **osobná správa**. Keď som sa pozrel do uličky, nebola tam len jeho postava. Bola tam tma s dvoma červenými bodkami, a zvuk ťukania prestal. Baldi nebehal. Len čakal.
+                            </p>
+                            <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-notebook', this)">
+                                Prečítať nahlas
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-            <!-- Príbeh 3: The Principal's Warning -->
-            <div class="story-card p-6 md:p-8 rounded-xl mb-8">
-                <div class="flex flex-col md:flex-row gap-6">
-                    <div class="w-full md:w-1/3 flex-shrink-0">
-                        <img src="https://placehold.co/400x250/333333/ff4444?text=PRINCIPAL%20(Obrázok)" alt="[Obrázok Riaditeľa v tme]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
+                <!-- Príbeh 2: Zvuk Skákania -->
+                <div class="story-card p-6 md:p-8 rounded-xl mb-8">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 flex-shrink-0">
+                            <img src="https://placehold.co/400x250/333333/ff4444?text=PLAYTIME%20(Obrázok)" alt="[Obrázok Playtime a laná]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
+                        </div>
+                        <!-- Text príbehu a ovládanie TTS -->
+                        <div class="w-full md:w-2/3">
+                            <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Charakterový Horor | GAMEPLA631</p>
+                            <h4 class="text-3xl font-bold text-white mb-3">Zvuk Skákania</h4>
+                            <p id="story-jumping" class="text-gray-400 mb-4 leading-relaxed">
+                                Playtime bola vždy otravná. Jej preskakovanie cez švihadlo bolo rituálom, hlučným signálom blížiacich sa problémov. Ale v budove V10 sa to zmenilo. Zvuk sa ozýval z vetracích šácht. Bolo to rytmické, ale tlmené. Akoby skákala vo veľmi malom, stiesnenom priestore. A nebol to detský smiech, ktorý ju sprevádzal, ale tiché, opakované chrčanie. Keď som otvoril skrinku, aby som sa schoval, zistil som, že šnúrky sú len predĺžené, tenké šľachy.
+                            </p>
+                            <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-jumping', this)">
+                                Prečítať nahlas
+                            </button>
+                        </div>
                     </div>
-                    <!-- Text príbehu a ovládanie TTS -->
-                    <div class="w-full md:w-2/3">
-                        <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Psychologický Horor | Oz Spoločenstvo</p>
-                        <h4 class="text-3xl font-bold text-white mb-3">Riaditeľovo Ticho</h4>
-                        <p id="story-principal" class="text-gray-400 mb-4 leading-relaxed">
-                            "Si zadržaný. Navždy." povedal Riaditeľ, a tentoraz to nebola len hrozba. Miesto jeho kancelárie bola teraz len biela izba bez dverí. Hodiny viseli v strede a stále ukazovali 7:00. Nechal ma tam, aby som čakal na trest, ale Baldi už nechodil. Ani Playtime. Bola tam len tma vonku a v bielom svetle som videl, ako sa Riaditeľov tieň na stene predlžuje a stáva sa tenším... a nakoniec sa premení na niečo, čo má presne sedem stôp dlhé pravítko.
-                        </p>
-                        <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-principal', this)">
-                            Prečítať nahlas
-                        </button>
+                </div>
+
+                <!-- Príbeh 3: The Principal's Warning -->
+                <div class="story-card p-6 md:p-8 rounded-xl mb-8">
+                    <div class="flex flex-col md:flex-row gap-6">
+                        <div class="w-full md:w-1/3 flex-shrink-0">
+                            <img src="https://placehold.co/400x250/333333/ff4444?text=PRINCIPAL%20(Obrázok)" alt="[Obrázok Riaditeľa v tme]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
+                        </div>
+                        <!-- Text príbehu a ovládanie TTS -->
+                        <div class="w-full md:w-2/3">
+                            <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Psychologický Horor | Oz Spoločenstvo</p>
+                            <h4 class="text-3xl font-bold text-white mb-3">Riaditeľovo Ticho</h4>
+                            <p id="story-principal" class="text-gray-400 mb-4 leading-relaxed">
+                                "Si zadržaný. Navždy." povedal Riaditeľ, a tentoraz to nebola len hrozba. Miesto jeho kancelárie bola teraz len biela izba bez dverí. Hodiny viseli v strede a stále ukazovali 7:00. Nechal ma tam, aby som čakal na trest, ale Baldi už nechodil. Ani Playtime. Bola tam len tma vonku a v bielom svetle som videl, ako sa Riaditeľov tieň na stene predlžuje a stáva sa tenším... a nakoniec sa premení na niečo, čo má presne sedem stôp dlhé pravítko.
+                            </p>
+                            <button class="tts-button bg-accent hover:bg-red-700 text-white font-semibold py-2 px-6 rounded-full transition duration-300 shadow-md shadow-red-900/50" onclick="handleTTS('story-principal', this)">
+                                Prečítať nahlas
+                            </button>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-        </section>
+            </section>
 
-        <!-- Sekcia o Autóroch -->
-        <section id="autori" class="text-center py-12 border-t border-gray-700 mt-12">
-            <h3 class="text-3xl font-bold text-white mb-4">O Autóroch Hry</h3>
-            <p class="text-lg text-gray-400 max-w-xl mx-auto mb-6">
-                Táto fan-stránka je venovaná desivým príbehom, ktoré vznikli na základe hry **Baldi's Basics Classic V10** na platforme Roblox.
-            </p>
-            <div class="flex justify-center space-x-8">
-                <div class="p-4 rounded-lg bg-gray-800 shadow-xl w-48">
-                    <h4 class="text-xl font-semibold text-accent">GAMEPLA631</h4>
-                    <p class="text-sm text-gray-400 mt-2">Hlavný Tvorca</p>
-                    <p class="text-xs text-gray-500 mt-1">Ďakujeme za temnú inšpiráciu!</p>
+            <!-- Sekcia o Autóroch -->
+            <section id="autori" class="text-center py-12 border-t border-gray-700 mt-12">
+                <h3 class="text-3xl font-bold text-white mb-4">O Autóroch Hry</h3>
+                <p class="text-lg text-gray-400 max-w-xl mx-auto mb-6">
+                    Táto fan-stránka je venovaná desivým príbehom, ktoré vznikli na základe hry **Baldi's Basics Classic V10** na platforme Roblox.
+                </p>
+                <div class="flex justify-center space-x-8">
+                    <div class="p-4 rounded-lg bg-gray-800 shadow-xl w-48">
+                        <h4 class="text-xl font-semibold text-accent">GAMEPLA631</h4>
+                        <p class="text-sm text-gray-400 mt-2">Hlavný Tvorca</p>
+                        <p class="text-xs text-gray-500 mt-1">Ďakujeme za temnú inšpiráciu!</p>
+                    </div>
+                    <div class="p-4 rounded-lg bg-gray-800 shadow-xl w-48">
+                        <h4 class="text-xl font-semibold text-accent">Oz Spoločenstvo</h4>
+                        <p class="text-sm text-gray-400 mt-2">Spolutvorca / Komunita</p>
+                        <p class="text-xs text-gray-500 mt-1">Prekračovanie hraníc strachu.</p>
+                    </div>
                 </div>
-                <div class="p-4 rounded-lg bg-gray-800 shadow-xl w-48">
-                    <h4 class="text-xl font-semibold text-accent">Oz Spoločenstvo</h4>
-                    <p class="text-sm text-gray-400 mt-2">Spolutvorca / Komunita</p>
-                    <p class="text-xs text-gray-500 mt-1">Prekračovanie hraníc strachu.</p>
-                </div>
-            </div>
-        </section>
+            </section>
+        </div>
 
     </main>
 
@@ -218,25 +266,204 @@
         </p>
     </footer>
 
-<script>
-    // Logika pre Web Speech API (Text-to-Speech - Čítanie nahlas)
+<script type="module">
+    // --- LOKÁLNA AUTENTIFIKÁCIA A STORAGE (BROWSER) ---
+    // POUŽÍVAME Local Storage na ukladanie údajov priamo v prehliadači.
+    const STORAGE_KEY = 'baldi_local_user';
+    const LOGGED_IN_FLAG = 'baldi_is_logged_in';
+    let authMode = 'login'; // 'login' alebo 'register'
+
+    /**
+     * Načíta uložený užívateľský objekt a stav prihlásenia z Local Storage.
+     * @returns {object|null} Objekt s užívateľskými údajmi a príznakom isLoggedIn, alebo null.
+     */
+    function getStoredUser() {
+        try {
+            const user = localStorage.getItem(STORAGE_KEY);
+            const isLoggedIn = localStorage.getItem(LOGGED_IN_FLAG) === 'true';
+            // Ak máme užívateľa, vrátime ho spolu so stavom prihlásenia
+            return user ? { ...JSON.parse(user), isLoggedIn } : null;
+        } catch (e) {
+            console.error("Chyba pri čítaní Local Storage:", e);
+            return null;
+        }
+    }
+
+    /**
+     * Uloží užívateľa a nastaví stav prihlásenia na 'true'.
+     * @param {object} user - Objekt obsahujúci email, password a uid.
+     */
+    function setStoredUser(user) {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
+        localStorage.setItem(LOGGED_IN_FLAG, 'true');
+    }
+
+    /**
+     * Vymaže stav prihlásenia z Local Storage, ale ponechá registrované údaje.
+     */
+    function clearStoredUser() {
+        localStorage.removeItem(LOGGED_IN_FLAG);
+    }
+
+    /**
+     * Aktualizuje viditeľnosť UI prvkov na základe stavu prihlásenia.
+     * @param {object|null} user - Aktuálny užívateľský objekt.
+     */
+    function updateUI(user) {
+        if (user && user.isLoggedIn) {
+            // Používateľ je prihlásený, ukáž obsah
+            document.getElementById('auth-screen').classList.add('hidden');
+            document.getElementById('app-content').classList.remove('hidden');
+            document.getElementById('logout-button').classList.remove('hidden');
+            // Zobrazíme e-mail a informáciu o lokálnom prihlásení
+            document.getElementById('user-info').textContent = `Prihlásený (LOKÁLNE): ${user.email}`;
+            document.getElementById('user-info').classList.remove('hidden');
+
+            // Ukáž navigáciu
+            document.getElementById('nav-stories').classList.remove('hidden');
+            document.getElementById('nav-authors').classList.remove('hidden');
+            document.getElementById('nav-roblox').classList.remove('hidden');
+        } else {
+            // Používateľ nie je prihlásený, ukáž prihlasovací formulár
+            document.getElementById('auth-screen').classList.remove('hidden');
+            document.getElementById('app-content').classList.add('hidden');
+            document.getElementById('logout-button').classList.add('hidden');
+            document.getElementById('user-info').classList.add('hidden');
+
+            // Skry navigáciu
+            document.getElementById('nav-stories').classList.add('hidden');
+            document.getElementById('nav-authors').classList.add('hidden');
+            document.getElementById('nav-roblox').classList.add('hidden');
+        }
+    }
+
+    /**
+     * Inicializácia pri načítaní stránky: skontroluje, či je užívateľ lokálne prihlásený.
+     */
+    function initializeAuth() {
+        const user = getStoredUser();
+        updateUI(user);
+    }
+
+    // --- OBSLUŽNÉ FUNKCIE PRE FORMULÁR ---
+
+    /**
+     * Prepína medzi režimami 'prihlásenie' a 'registrácia'.
+     */
+    window.toggleAuthMode = function() {
+        authMode = authMode === 'login' ? 'register' : 'login';
+        const title = document.getElementById('auth-title');
+        const submitBtn = document.getElementById('auth-submit-btn');
+        const toggleBtn = document.getElementById('toggle-auth-btn');
+
+        if (authMode === 'register') {
+            title.textContent = 'Registrácia nového účtu';
+            submitBtn.textContent = 'Zaregistrovať sa';
+            toggleBtn.innerHTML = 'Už máte účet? **Prihláste sa**';
+        } else {
+            title.textContent = 'Prihláste sa pre prístup k Hororom';
+            submitBtn.textContent = 'Prihlásiť sa';
+            toggleBtn.innerHTML = 'Nemáte účet? **Zaregistrujte sa**';
+        }
+        document.getElementById('auth-error-message').classList.add('hidden');
+    }
+
+    /**
+     * Spracováva odoslanie formulára (prihlásenie alebo registrácia) pomocou Local Storage.
+     */
+    window.handleAuthSubmit = async function() {
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const errorMsg = document.getElementById('auth-error-message');
+        const loader = document.getElementById('auth-loader');
+        
+        const email = emailInput.value;
+        const password = passwordInput.value;
+
+        errorMsg.classList.add('hidden');
+        loader.classList.remove('hidden');
+        
+        // Načítaj uloženého užívateľa (simulácia databázy v Local Storage)
+        const storedUser = JSON.parse(localStorage.getItem(STORAGE_KEY));
+
+        try {
+            if (authMode === 'register') {
+                if (storedUser) {
+                    // Už existuje jeden lokálny účet v tomto prehliadači
+                    throw { code: 'local/already-registered', message: 'Tento prehliadač už má registrovaný účet. Prosím, použite prihlásenie.' };
+                }
+                if (password.length < 6) {
+                     throw { code: 'local/weak-password', message: 'Heslo musí mať aspoň 6 znakov.' };
+                }
+                
+                // Registrácia úspešná: Uložíme údaje a prihlásime
+                const newUser = { email: email, password: password, uid: 'local-' + Date.now() };
+                setStoredUser(newUser); 
+                updateUI(newUser);
+
+            } else { // Login Mode
+                if (!storedUser) {
+                    // Žiadny registrovaný účet
+                     throw { code: 'local/no-user', message: 'Žiadny lokálny účet nebol nájdený. Najprv sa zaregistrujte.' };
+                }
+
+                // Overenie hesla proti uloženým údajom
+                if (storedUser.email === email && storedUser.password === password) {
+                    const loggedInUser = { ...storedUser, isLoggedIn: true };
+                    setStoredUser(loggedInUser);
+                    updateUI(loggedInUser);
+                } else {
+                    throw { code: 'local/wrong-credentials', message: 'Nesprávny e-mail alebo heslo.' };
+                }
+            }
+        } catch (error) {
+            let userMessage = error.message || "Vyskytla sa neznáma chyba pri autentifikácii.";
+            
+            // Mapovanie chybových kódov pre zobrazenie užívateľovi
+            if (error.code === 'local/already-registered') {
+                userMessage = "Tento prehliadač už má registrovaný účet. Prosím, prihláste sa.";
+            } else if (error.code === 'local/no-user') {
+                userMessage = "Žiadny účet nebol nájdený. Najprv sa zaregistrujte.";
+            } else if (error.code === 'local/wrong-credentials') {
+                userMessage = "Nesprávny e-mail alebo heslo.";
+            } else if (error.code === 'local/weak-password') {
+                 userMessage = "Heslo by malo mať aspoň 6 znakov.";
+            }
+            
+            errorMsg.textContent = userMessage;
+            errorMsg.classList.remove('hidden');
+            console.error("Auth Error:", error.code, error.message);
+        } finally {
+            loader.classList.add('hidden');
+        }
+    }
+
+    /**
+     * Spracováva odhlásenie používateľa (zruší stav v Local Storage).
+     */
+    window.handleLogout = function() {
+        clearStoredUser();
+        // UI sa zaktualizuje na prihlasovaciu obrazovku
+        updateUI(getStoredUser());
+    }
+
+    // Spustenie inicializácie pri štarte aplikácie
+    initializeAuth();
+
+
+    // --- LOGIKA TTS (POUŽÍVANÁ V RÁMCI APP-CONTENT) ---
     const synth = window.speechSynthesis;
     let currentlySpeakingButton = null;
 
-    // Skontroluje, či prehliadač podporuje TTS
     if (!('speechSynthesis' in window)) {
         document.getElementById('tts-warning').classList.remove('hidden');
     }
 
-    /**
-     * Zastaví aktuálne prebiehajúce čítanie a resetuje tlačidlá.
-     */
     function stopSpeech() {
         if (synth.speaking) {
             synth.cancel();
         }
         
-        // Resetuje vizuálny stav všetkých tlačidiel
         document.querySelectorAll('.tts-button').forEach(btn => {
             btn.textContent = 'Prečítať nahlas';
             btn.classList.remove('bg-red-700');
@@ -245,21 +472,12 @@
         currentlySpeakingButton = null;
     }
 
-    /**
-     * Začne čítať zadaný text a aktualizuje stav tlačidla.
-     * @param {string} storyText - Text príbehu na prečítanie.
-     * @param {HTMLElement} buttonElement - Element tlačidla, ktoré spustilo čítanie.
-     */
     function speakText(storyText, buttonElement) {
-        // Vytvorenie nového utterance (hlasového prejavu)
         const utterance = new SpeechSynthesisUtterance(storyText);
-        
-        // Pokus o nastavenie slovenčiny. Ak nie je k dispozícii, použije sa predvolený jazyk.
         utterance.lang = 'sk-SK';
         utterance.rate = 1; 
         utterance.pitch = 1;
 
-        // Vizuálna aktualizácia tlačidla po začatí čítania
         utterance.onstart = () => {
             buttonElement.textContent = 'Zastaviť čítanie (STOP)';
             buttonElement.classList.remove('bg-accent');
@@ -267,7 +485,6 @@
             currentlySpeakingButton = buttonElement;
         };
 
-        // Vizuálna aktualizácia tlačidla po skončení čítania
         utterance.onend = () => {
             buttonElement.textContent = 'Prečítať nahlas';
             buttonElement.classList.remove('bg-red-700');
@@ -275,52 +492,37 @@
             currentlySpeakingButton = null;
         };
         
-        // Spracovanie chyby (napr. ak systémový hlas nebol nájdený)
         utterance.onerror = (event) => {
             console.error('Speech synthesis error: ' + event.error);
             stopSpeech();
         };
 
-
-        // Spustenie čítania
         synth.speak(utterance);
     }
 
-    /**
-     * Hlavná obslužná funkcia pre kliknutie na TTS tlačidlo.
-     * @param {string} storyId - ID elementu, ktorý obsahuje text príbehu.
-     * @param {HTMLElement} buttonElement - Element tlačidla.
-     */
-    function handleTTS(storyId, buttonElement) {
+    window.handleTTS = function(storyId, buttonElement) {
         const storyElement = document.getElementById(storyId);
         if (!storyElement) {
             console.error('Story element not found:', storyId);
             return;
         }
 
-        // Extrahovanie textu, odstránenie prebytočných medzier a HTML značiek pre lepší prejav
         let storyText = storyElement.innerHTML
-            .replace(/<br>/g, '. ') // Nahradí <br> bodkou pre lepšiu pauzu
+            .replace(/<br>/g, '. ')
             .replace(/\s\s+/g, ' ')
             .trim();
 
-        // Ak sa už číta a klikneme na to isté tlačidlo, zastavíme čítanie
         if (currentlySpeakingButton === buttonElement) {
             stopSpeech();
         } else {
-            // Nový príbeh. Zistíme, či sa už čítalo
             const wasSpeaking = synth.speaking;
-
-            // 1. Zastavíme predchádzajúce čítanie (ak nejaké bolo) a resetujeme tlačidlá
             stopSpeech(); 
             
-            // 2. Ak sa predtým čítalo, vložíme malé oneskorenie, aby sme zabránili chybe 'interrupted'.
             if (wasSpeaking) {
                  setTimeout(() => {
                     speakText(storyText, buttonElement);
-                }, 50); // 50ms oneskorenie
+                }, 50);
             } else {
-                // Ak sa nečítalo, spustíme okamžite
                 speakText(storyText, buttonElement);
             }
         }
@@ -329,4 +531,5 @@
 
 </body>
 </html>
+
 

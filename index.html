@@ -80,8 +80,6 @@
             <div class="max-w-lg mx-auto story-card p-8 md:p-10 rounded-xl">
                 <h3 id="auth-title" class="text-3xl font-bold text-accent mb-6">Prihláste sa pre prístup k Hororom</h3>
                 
-                <!-- ODSTRÁNENÉ UPOZORNENIE O LOCAL STORAGE -->
-
                 <form id="auth-form" onsubmit="event.preventDefault(); handleAuthSubmit()">
                     <input type="email" id="email" placeholder="E-mail" required
                            class="w-full p-3 mb-4 bg-gray-700 text-white border border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
@@ -269,45 +267,66 @@
 <script type="module">
     // --- LOKÁLNA AUTENTIFIKÁCIA A STORAGE (BROWSER) ---
     // POUŽÍVAME Local Storage na ukladanie údajov priamo v prehliadači.
-    const STORAGE_KEY = 'baldi_local_user';
-    const LOGGED_IN_FLAG = 'baldi_is_logged_in';
+    const USERS_KEY = 'baldi_local_users_map'; // Kľúč pre mapu všetkých registrovaných užívateľov
+    const LOGGED_IN_EMAIL_KEY = 'baldi_logged_in_email'; // Ukladá e-mail aktuálne prihláseného užívateľa
     let authMode = 'login'; // 'login' alebo 'register'
 
     /**
-     * Načíta uložený užívateľský objekt a stav prihlásenia z Local Storage.
-     * @returns {object|null} Objekt s užívateľskými údajmi a príznakom isLoggedIn, alebo null.
+     * Načíta mapu všetkých registrovaných užívateľov.
+     * @returns {object} Mapa užívateľov, kde kľúčom je e-mail.
      */
-    function getStoredUser() {
+    function getStoredUsersMap() {
         try {
-            const user = localStorage.getItem(STORAGE_KEY);
-            const isLoggedIn = localStorage.getItem(LOGGED_IN_FLAG) === 'true';
-            // Ak máme užívateľa, vrátime ho spolu so stavom prihlásenia
-            return user ? { ...JSON.parse(user), isLoggedIn } : null;
+            const usersJson = localStorage.getItem(USERS_KEY);
+            // Ak Local Storage vracia null, vrátime prázdny objekt (mapu)
+            return usersJson ? JSON.parse(usersJson) : {};
         } catch (e) {
-            console.error("Chyba pri čítaní Local Storage:", e);
-            return null;
+            console.error("Chyba pri čítaní mapy užívateľov z Local Storage:", e);
+            return {};
         }
     }
 
     /**
-     * Uloží užívateľa a nastaví stav prihlásenia na 'true'.
-     * @param {object} user - Objekt obsahujúci email, password a uid.
+     * Uloží mapu všetkých registrovaných užívateľov.
+     * @param {object} usersMap - Mapa užívateľov.
      */
-    function setStoredUser(user) {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify(user));
-        localStorage.setItem(LOGGED_IN_FLAG, 'true');
+    function setStoredUsersMap(usersMap) {
+        localStorage.setItem(USERS_KEY, JSON.stringify(usersMap));
+    }
+    
+    /**
+     * Získa aktuálne prihláseného užívateľa.
+     * @returns {object|null} Objekt prihláseného užívateľa s pridaným kľúčom 'isLoggedIn', alebo null.
+     */
+    function getLoggedInUser() {
+        const loggedInEmail = localStorage.getItem(LOGGED_IN_EMAIL_KEY);
+        if (!loggedInEmail) return null;
+
+        const usersMap = getStoredUsersMap();
+        const user = usersMap[loggedInEmail];
+
+        // Vráti užívateľský objekt s príznakom, že je prihlásený.
+        return user ? { ...user, isLoggedIn: true } : null;
     }
 
     /**
-     * Vymaže stav prihlásenia z Local Storage, ale ponechá registrované údaje.
+     * Nastaví stav prihlásenia pre daný e-mail.
+     * @param {string} email - E-mail užívateľa, ktorý sa prihlásil.
      */
-    function clearStoredUser() {
-        localStorage.removeItem(LOGGED_IN_FLAG);
+    function setLoggedInState(email) {
+        localStorage.setItem(LOGGED_IN_EMAIL_KEY, email);
     }
 
+    /**
+     * Vymaže stav prihlásenia.
+     */
+    function clearLoggedInState() {
+        localStorage.removeItem(LOGGED_IN_EMAIL_KEY);
+    }
+    
     /**
      * Aktualizuje viditeľnosť UI prvkov na základe stavu prihlásenia.
-     * @param {object|null} user - Aktuálny užívateľský objekt.
+     * @param {object|null} user - Aktuálny užívateľský objekt (z getLoggedInUser).
      */
     function updateUI(user) {
         if (user && user.isLoggedIn) {
@@ -315,7 +334,7 @@
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-content').classList.remove('hidden');
             document.getElementById('logout-button').classList.remove('hidden');
-            // Zobrazíme e-mail a informáciu o lokálnom prihlásení
+            // Zobrazíme e-mail
             document.getElementById('user-info').textContent = `Prihlásený (LOKÁLNE): ${user.email}`;
             document.getElementById('user-info').classList.remove('hidden');
 
@@ -341,7 +360,7 @@
      * Inicializácia pri načítaní stránky: skontroluje, či je užívateľ lokálne prihlásený.
      */
     function initializeAuth() {
-        const user = getStoredUser();
+        const user = getLoggedInUser();
         updateUI(user);
     }
 
@@ -377,41 +396,45 @@
         const errorMsg = document.getElementById('auth-error-message');
         const loader = document.getElementById('auth-loader');
         
-        const email = emailInput.value;
+        const email = emailInput.value.toLowerCase().trim(); // Normalizácia e-mailu
         const password = passwordInput.value;
 
         errorMsg.classList.add('hidden');
         loader.classList.remove('hidden');
         
-        // Načítaj uloženého užívateľa (simulácia databázy v Local Storage)
-        const storedUser = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        // Načítaj mapu všetkých užívateľov
+        const usersMap = getStoredUsersMap();
 
         try {
             if (authMode === 'register') {
-                if (storedUser) {
-                    // Už existuje jeden lokálny účet v tomto prehliadači
-                    throw { code: 'local/already-registered', message: 'Tento prehliadač už má registrovaný účet. Prosím, použite prihlásenie.' };
+                if (usersMap[email]) {
+                    // Užívateľ s týmto e-mailom už je registrovaný
+                    throw { code: 'local/email-exists', message: 'Užívateľ s týmto e-mailom už je zaregistrovaný. Prosím, prihláste sa.' };
                 }
                 if (password.length < 6) {
                      throw { code: 'local/weak-password', message: 'Heslo musí mať aspoň 6 znakov.' };
                 }
                 
-                // Registrácia úspešná: Uložíme údaje a prihlásime
+                // Registrácia úspešná: Uložíme nového užívateľa do mapy a prihlásime ho
                 const newUser = { email: email, password: password, uid: 'local-' + Date.now() };
-                setStoredUser(newUser); 
-                updateUI(newUser);
+                usersMap[email] = newUser;
+                setStoredUsersMap(usersMap); // Uložiť celú mapu
+                setLoggedInState(email); // Nastaviť stav prihlásenia
+                
+                updateUI({ ...newUser, isLoggedIn: true });
 
             } else { // Login Mode
+                const storedUser = usersMap[email];
+                
                 if (!storedUser) {
-                    // Žiadny registrovaný účet
-                     throw { code: 'local/no-user', message: 'Žiadny lokálny účet nebol nájdený. Najprv sa zaregistrujte.' };
+                    // Užívateľ nebol nájdený
+                     throw { code: 'local/no-user', message: 'Užívateľ s týmto e-mailom nebol nájdený. Najprv sa zaregistrujte.' };
                 }
 
-                // Overenie hesla proti uloženým údajom
-                if (storedUser.email === email && storedUser.password === password) {
-                    const loggedInUser = { ...storedUser, isLoggedIn: true };
-                    setStoredUser(loggedInUser);
-                    updateUI(loggedInUser);
+                // Overenie hesla
+                if (storedUser.password === password) {
+                    setLoggedInState(email); // Nastaviť stav prihlásenia
+                    updateUI({ ...storedUser, isLoggedIn: true });
                 } else {
                     throw { code: 'local/wrong-credentials', message: 'Nesprávny e-mail alebo heslo.' };
                 }
@@ -420,10 +443,10 @@
             let userMessage = error.message || "Vyskytla sa neznáma chyba pri autentifikácii.";
             
             // Mapovanie chybových kódov pre zobrazenie užívateľovi
-            if (error.code === 'local/already-registered') {
-                userMessage = "Tento prehliadač už má registrovaný účet. Prosím, prihláste sa.";
+            if (error.code === 'local/email-exists') {
+                userMessage = "Tento e-mail je už registrovaný. Prosím, použite Prihlásenie.";
             } else if (error.code === 'local/no-user') {
-                userMessage = "Žiadny účet nebol nájdený. Najprv sa zaregistrujte.";
+                userMessage = "Užívateľ nebol nájdený. Skúste registráciu.";
             } else if (error.code === 'local/wrong-credentials') {
                 userMessage = "Nesprávny e-mail alebo heslo.";
             } else if (error.code === 'local/weak-password') {
@@ -442,9 +465,9 @@
      * Spracováva odhlásenie používateľa (zruší stav v Local Storage).
      */
     window.handleLogout = function() {
-        clearStoredUser();
+        clearLoggedInState();
         // UI sa zaktualizuje na prihlasovaciu obrazovku
-        updateUI(getStoredUser());
+        updateUI(getLoggedInUser());
     }
 
     // Spustenie inicializácie pri štarte aplikácie
@@ -531,5 +554,6 @@
 
 </body>
 </html>
+
 
 

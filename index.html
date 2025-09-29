@@ -44,6 +44,16 @@
             flex-direction: column;
             justify-content: center;
         }
+        /* Štýl pre MODAL OKNO */
+        .modal-overlay {
+            background-color: rgba(0, 0, 0, 0.85); /* Tmavý, pohlcujúci overlay */
+            backdrop-filter: blur(4px);
+        }
+        .payment-card {
+            background-color: #111111;
+            border: 2px solid #ff4444;
+            box-shadow: 0 0 50px rgba(255, 68, 68, 0.4);
+        }
     </style>
     <!-- Font Inter (predvolený pre Tailwind, ale pre istotu) -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
@@ -59,7 +69,7 @@
             <nav class="hidden md:flex space-x-6 items-center">
                 <a href="#pribehy" id="nav-stories" class="text-gray-300 hover:text-white transition duration-300 hidden">Príbehy</a>
                 <a href="#autori" id="nav-authors" class="text-gray-300 hover:text-white transition duration-300 hidden">O Autóroch</a>
-                <!-- ODKAZ NA ROBLOX HRU -->
+                <!-- ODKAZ NA ROBLOX HRU (len pre navigáciu, nie tlačidlo) -->
                 <a href="https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007" target="_blank" id="nav-roblox" class="text-gray-300 hover:text-white transition duration-300 hidden">Roblox Hra</a>
                 <!-- TLAČIDLO ODHLÁSENIA -->
                 <button id="logout-button" onclick="handleLogout()" class="text-sm bg-red-600 hover:bg-red-700 text-white font-semibold py-1 px-3 rounded-md transition duration-300 hidden">Odhlásiť sa</button>
@@ -120,15 +130,16 @@
                 </p>
             </div>
 
-            <!-- NOVÁ Sekcia: CTA pre hru -->
+            <!-- Sekcia: CTA s PLATBOU -->
             <div class="text-center mb-12">
-                <a href="https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007" target="_blank" 
+                <button onclick="openPaymentModal()" 
                    class="inline-block bg-green-600 hover:bg-green-700 text-white text-xl font-bold py-4 px-10 rounded-xl transition duration-300 transform hover:scale-105 shadow-lg shadow-green-900/50">
                     HRAJTE NAŠU HRU V10 NA ROBLOXE TERAZ!
-                </a>
+                </button>
+                <p class="text-sm text-gray-500 mt-2">Prístup k priamemu odkazu stojí **€59,99**</p>
             </div>
             
-            <!-- Sekcia s Príbehmi -->
+            <!-- Sekcia s Príbehmi (Zostáva nezmenená) -->
             <section id="pribehy" class="mb-12">
                 <h3 class="text-4xl font-bold text-accent mb-8 border-b-2 border-accent pb-2">Najnovšie Príbehy</h3>
                 
@@ -139,14 +150,12 @@
                     </p>
                 </div>
 
-                <!-- NOVÝ Príbeh: Šialenstvo V10: Absolútna Rýchlosť (ÚPLNÝ TEXT) -->
+                <!-- Príbehy... -->
                 <div class="story-card p-6 md:p-8 rounded-xl mb-8">
                     <div class="flex flex-col md:flex-row gap-6">
-                        <!-- Placeholder pre obrázok príbehu -->
                         <div class="w-full md:w-1/3 flex-shrink-0">
                             <img src="https://placehold.co/400x250/550000/ff4444?text=BALDI%20V10%20(Transformácia)" alt="[Obrázok Baldiho a školy V10]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
                         </div>
-                        <!-- Text príbehu a ovládanie TTS -->
                         <div class="w-full md:w-2/3">
                             <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Hlavný Lore / V10 Zlyhanie | Oz Spoločenstvo</p>
                             <h4 class="text-3xl font-bold text-accent mb-3">Šialenstvo V10: Absolútna Rýchlosť</h4>
@@ -173,11 +182,9 @@
                 <!-- Príbeh 1: Desiaty Zápisník (posunutý dole) -->
                 <div class="story-card p-6 md:p-8 rounded-xl mb-8">
                     <div class="flex flex-col md:flex-row gap-6">
-                        <!-- Placeholder pre obrázok príbehu -->
                         <div class="w-full md:w-1/3 flex-shrink-0">
                             <img src="https://placehold.co/400x250/333333/ff4444?text=BALDI%20V10%20(Obrázok)" alt="[Obrázok Baldiho a školy]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
                         </div>
-                        <!-- Text príbehu a ovládanie TTS -->
                         <div class="w-full md:w-2/3">
                             <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Pôvodný Horor | GAMEPLA631 & Oz Spoločenstvo</p>
                             <h4 class="text-3xl font-bold text-white mb-3">Desiaty Zápisník</h4>
@@ -197,7 +204,6 @@
                         <div class="w-full md:w-1/3 flex-shrink-0">
                             <img src="https://placehold.co/400x250/333333/ff4444?text=PLAYTIME%20(Obrázok)" alt="[Obrázok Playtime a laná]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
                         </div>
-                        <!-- Text príbehu a ovládanie TTS -->
                         <div class="w-full md:w-2/3">
                             <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Charakterový Horor | GAMEPLA631</p>
                             <h4 class="text-3xl font-bold text-white mb-3">Zvuk Skákania</h4>
@@ -217,7 +223,6 @@
                         <div class="w-full md:w-1/3 flex-shrink-0">
                             <img src="https://placehold.co/400x250/333333/ff4444?text=PRINCIPAL%20(Obrázok)" alt="[Obrázok Riaditeľa v tme]" class="rounded-lg w-full h-auto object-cover border-2 border-red-900">
                         </div>
-                        <!-- Text príbehu a ovládanie TTS -->
                         <div class="w-full md:w-2/3">
                             <p class="text-xs uppercase text-gray-500 mb-2">Kategória: Psychologický Horor | Oz Spoločenstvo</p>
                             <h4 class="text-3xl font-bold text-white mb-3">Riaditeľovo Ticho</h4>
@@ -264,21 +269,76 @@
         </p>
     </footer>
 
-<script type="module">
-    // --- LOKÁLNA AUTENTIFIKÁCIA A STORAGE (BROWSER) ---
-    // POUŽÍVAME Local Storage na ukladanie údajov priamo v prehliadači.
-    const USERS_KEY = 'baldi_local_users_map'; // Kľúč pre mapu všetkých registrovaných užívateľov
-    const LOGGED_IN_EMAIL_KEY = 'baldi_logged_in_email'; // Ukladá e-mail aktuálne prihláseného užívateľa
-    let authMode = 'login'; // 'login' alebo 'register'
+    <!-- MODAL OKNO PRE SIMULOVANÚ PLATBU -->
+    <div id="payment-modal" class="modal-overlay fixed inset-0 z-[100] hidden items-center justify-center p-4" onclick="closePaymentModal()">
+        <div class="payment-card w-full max-w-md p-6 md:p-8 rounded-2xl relative animate-in zoom-in duration-500" onclick="event.stopPropagation()">
+            
+            <!-- Tlačidlo zatvorenia -->
+            <button onclick="closePaymentModal()" class="absolute top-4 right-4 text-gray-400 hover:text-white transition">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
 
-    /**
-     * Načíta mapu všetkých registrovaných užívateľov.
-     * @returns {object} Mapa užívateľov, kde kľúčom je e-mail.
-     */
+            <h3 class="text-3xl font-bold text-accent mb-2 text-center">PayPayNeed Brána</h3>
+            <p class="text-lg text-white mb-6 text-center font-bold">Platba za prístup: <span class="text-green-400">€59,99</span></p>
+
+            <form id="payment-form" onsubmit="event.preventDefault(); processPayment()">
+                
+                <div id="payment-step-1">
+                    <!-- ZMENENÝ TEXT: Neutrálny a zameraný na transakciu -->
+                    <p class="text-sm text-gray-300 mb-4">Prosím, zadajte svoje platobné údaje. Je to **fiktívna** transakcia. Pre dokončenie vyplňte všetky polia.</p>
+                    
+                    <label for="card-number" class="block text-sm font-medium mb-1 text-gray-400">Číslo karty</label>
+                    <input type="text" id="card-number" placeholder="XXXX XXXX XXXX XXXX" required
+                           class="w-full p-3 mb-4 bg-gray-900 text-white border border-red-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+
+                    <div class="flex space-x-4 mb-6">
+                        <div class="w-1/2">
+                            <label for="expiry" class="block text-sm font-medium mb-1 text-gray-400">Dátum expirácie</label>
+                            <input type="text" id="expiry" placeholder="MM/RR" required
+                                   class="w-full p-3 bg-gray-900 text-white border border-red-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                        </div>
+                        <div class="w-1/2">
+                            <label for="cvv" class="block text-sm font-medium mb-1 text-gray-400">CVV</label>
+                            <input type="text" id="cvv" placeholder="XXX" required maxlength="3"
+                                   class="w-full p-3 bg-gray-900 text-white border border-red-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                        </div>
+                    </div>
+
+                    <label for="paypayneed-pin" class="block text-sm font-medium mb-1 text-gray-400">PayPayNeed Kód</label>
+                    <input type="password" id="paypayneed-pin" placeholder="XXXX" required maxlength="4"
+                           class="w-full p-3 mb-6 bg-gray-900 text-white border border-red-700/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-accent">
+                </div>
+
+                <div id="payment-status-message" class="text-center hidden">
+                    <div id="loader-spinner" class="animate-spin h-10 w-10 border-4 border-red-500 border-t-transparent mx-auto mb-4 rounded-full hidden"></div>
+                    <p id="status-text" class="text-xl font-semibold"></p>
+                    <p id="substatus-text" class="text-gray-400 text-sm mt-2"></p>
+                </div>
+
+
+                <button type="submit" id="pay-button" 
+                        class="w-full bg-accent hover:bg-red-700 text-white text-lg font-semibold py-3 rounded-lg transition duration-300 shadow-lg shadow-red-900/50">
+                    Spracovať platbu €59,99
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+
+<script type="module">
+    // --- KONŠTANTY ---
+    const USERS_KEY = 'baldi_local_users_map';
+    const LOGGED_IN_EMAIL_KEY = 'baldi_logged_in_email';
+    const ROBLOX_LINK = "https://www.roblox.com/share?code=c927009cc56d644fbd071b9bf5838441&type=ExperienceDetails&stamp=1759164339007";
+    let authMode = 'login'; 
+
+
+    // --- FUNKCIE PRE AUTHENTIFIKÁCIU A STORAGE ---
+
     function getStoredUsersMap() {
         try {
             const usersJson = localStorage.getItem(USERS_KEY);
-            // Ak Local Storage vracia null, vrátime prázdny objekt (mapu)
             return usersJson ? JSON.parse(usersJson) : {};
         } catch (e) {
             console.error("Chyba pri čítaní mapy užívateľov z Local Storage:", e);
@@ -286,18 +346,10 @@
         }
     }
 
-    /**
-     * Uloží mapu všetkých registrovaných užívateľov.
-     * @param {object} usersMap - Mapa užívateľov.
-     */
     function setStoredUsersMap(usersMap) {
         localStorage.setItem(USERS_KEY, JSON.stringify(usersMap));
     }
     
-    /**
-     * Získa aktuálne prihláseného užívateľa.
-     * @returns {object|null} Objekt prihláseného užívateľa s pridaným kľúčom 'isLoggedIn', alebo null.
-     */
     function getLoggedInUser() {
         const loggedInEmail = localStorage.getItem(LOGGED_IN_EMAIL_KEY);
         if (!loggedInEmail) return null;
@@ -305,70 +357,45 @@
         const usersMap = getStoredUsersMap();
         const user = usersMap[loggedInEmail];
 
-        // Vráti užívateľský objekt s príznakom, že je prihlásený.
         return user ? { ...user, isLoggedIn: true } : null;
     }
 
-    /**
-     * Nastaví stav prihlásenia pre daný e-mail.
-     * @param {string} email - E-mail užívateľa, ktorý sa prihlásil.
-     */
     function setLoggedInState(email) {
         localStorage.setItem(LOGGED_IN_EMAIL_KEY, email);
     }
 
-    /**
-     * Vymaže stav prihlásenia.
-     */
-    window.clearLoggedInState = function() { // Exportované pre handleLogout
+    window.clearLoggedInState = function() { 
         localStorage.removeItem(LOGGED_IN_EMAIL_KEY);
     }
     
-    /**
-     * Aktualizuje viditeľnosť UI prvkov na základe stavu prihlásenia.
-     * @param {object|null} user - Aktuálny užívateľský objekt (z getLoggedInUser).
-     */
     function updateUI(user) {
         if (user && user.isLoggedIn) {
-            // Používateľ je prihlásený, ukáž obsah
             document.getElementById('auth-screen').classList.add('hidden');
             document.getElementById('app-content').classList.remove('hidden');
             document.getElementById('logout-button').classList.remove('hidden');
-            // Zobrazíme e-mail
             document.getElementById('user-info').textContent = `Prihlásený (LOKÁLNE): ${user.email}`;
             document.getElementById('user-info').classList.remove('hidden');
 
-            // Ukáž navigáciu
             document.getElementById('nav-stories').classList.remove('hidden');
             document.getElementById('nav-authors').classList.remove('hidden');
             document.getElementById('nav-roblox').classList.remove('hidden');
         } else {
-            // Používateľ nie je prihlásený, ukáž prihlasovací formulár
             document.getElementById('auth-screen').classList.remove('hidden');
             document.getElementById('app-content').classList.add('hidden');
             document.getElementById('logout-button').classList.add('hidden');
             document.getElementById('user-info').classList.add('hidden');
 
-            // Skry navigáciu
             document.getElementById('nav-stories').classList.add('hidden');
             document.getElementById('nav-authors').classList.add('hidden');
             document.getElementById('nav-roblox').classList.add('hidden');
         }
     }
 
-    /**
-     * Inicializácia pri načítaní stránky: skontroluje, či je užívateľ lokálne prihlásený.
-     */
     function initializeAuth() {
         const user = getLoggedInUser();
         updateUI(user);
     }
 
-    // --- OBSLUŽNÉ FUNKCIE PRE FORMULÁR ---
-
-    /**
-     * Prepína medzi režimami 'prihlásenie' a 'registrácia'.
-     */
     window.toggleAuthMode = function() {
         authMode = authMode === 'login' ? 'register' : 'login';
         const title = document.getElementById('auth-title');
@@ -387,40 +414,34 @@
         document.getElementById('auth-error-message').classList.add('hidden');
     }
 
-    /**
-     * Spracováva odoslanie formulára (prihlásenie alebo registrácia) pomocou Local Storage.
-     */
     window.handleAuthSubmit = async function() {
         const emailInput = document.getElementById('email');
         const passwordInput = document.getElementById('password');
         const errorMsg = document.getElementById('auth-error-message');
         const loader = document.getElementById('auth-loader');
         
-        const email = emailInput.value.toLowerCase().trim(); // Normalizácia e-mailu
+        const email = emailInput.value.toLowerCase().trim();
         const password = passwordInput.value;
 
         errorMsg.classList.add('hidden');
         loader.classList.remove('hidden');
         
-        // Načítaj mapu všetkých užívateľov
         const usersMap = getStoredUsersMap();
 
         try {
             if (authMode === 'register') {
                 if (usersMap[email]) {
-                    // Užívateľ s týmto e-mailom už je registrovaný
-                    // Zmenený kód a správa pre lepšiu diagnostiku
+                    // Aktualizovaná chybová správa, ktorá potvrdzuje, že registrácia viacerých účtov je možná, ak e-mail nie je duplicitný.
                     throw { code: 'local/duplicate-email', message: `Tento e-mail (${email}) je už v tomto prehliadači zaregistrovaný. Prosím, prihláste sa, alebo použite iný e-mail.` };
                 }
                 if (password.length < 6) {
                      throw { code: 'local/weak-password', message: 'Heslo musí mať aspoň 6 znakov.' };
                 }
                 
-                // Registrácia úspešná: Uložíme nového užívateľa do mapy a prihlásime ho
                 const newUser = { email: email, password: password, uid: 'local-' + Date.now() };
                 usersMap[email] = newUser;
-                setStoredUsersMap(usersMap); // Uložiť celú mapu
-                setLoggedInState(email); // Nastaviť stav prihlásenia
+                setStoredUsersMap(usersMap);
+                setLoggedInState(email);
                 
                 updateUI({ ...newUser, isLoggedIn: true });
 
@@ -428,13 +449,12 @@
                 const storedUser = usersMap[email];
                 
                 if (!storedUser) {
-                    // Užívateľ nebol nájdený
+                     // Opravená chyba, ktorá automaticky prepne na registráciu, ak používateľ nebol nájdený.
                      throw { code: 'local/no-user', message: 'Užívateľ s týmto e-mailom nebol nájdený. Najprv sa zaregistrujte.' };
                 }
 
-                // Overenie hesla
                 if (storedUser.password === password) {
-                    setLoggedInState(email); // Nastaviť stav prihlásenia
+                    setLoggedInState(email);
                     updateUI({ ...storedUser, isLoggedIn: true });
                 } else {
                     throw { code: 'local/wrong-credentials', message: 'Nesprávne heslo.' };
@@ -443,12 +463,16 @@
         } catch (error) {
             let userMessage = error.message || "Vyskytla sa neznáma chyba pri autentifikácii.";
             
-            // Mapovanie chybových kódov pre zobrazenie užívateľovi
             if (error.code === 'local/duplicate-email') {
-                // Použijeme dynamickú správu, ktorá obsahuje email
                 userMessage = error.message; 
             } else if (error.code === 'local/no-user') {
-                userMessage = "Užívateľ s týmto e-mailom nebol nájdený. Skúste registráciu.";
+                // OPRAVA: Ak používateľ nebol nájdený pri prihlásení, prepneme automaticky na registráciu pre lepší UX.
+                if (authMode === 'login') {
+                    toggleAuthMode();
+                    userMessage = "Účet s týmto e-mailom neexistuje. Prepli sme na **Registráciu**. Zadajte heslo a pokračujte.";
+                } else {
+                    userMessage = "Užívateľ s týmto e-mailom nebol nájdený. Skúste registráciu.";
+                }
             } else if (error.code === 'local/wrong-credentials') {
                 userMessage = "Nesprávny e-mail alebo heslo.";
             } else if (error.code === 'local/weak-password') {
@@ -463,20 +487,113 @@
         }
     }
 
-    /**
-     * Spracováva odhlásenie používateľa (zruší stav v Local Storage).
-     */
     window.handleLogout = function() {
         clearLoggedInState();
-        // UI sa zaktualizuje na prihlasovaciu obrazovku
         updateUI(getLoggedInUser());
     }
 
-    // Spustenie inicializácie pri štarte aplikácie
-    initializeAuth();
 
+    // --- FUNKCIE PRE SIMULOVANÚ PLATBU ---
 
-    // --- LOGIKA TTS (POUŽÍVANÁ V RÁMCI APP-CONTENT) ---
+    const modal = document.getElementById('payment-modal');
+    const payForm = document.getElementById('payment-form');
+    const payButton = document.getElementById('pay-button');
+    const statusDiv = document.getElementById('payment-status-message');
+    const loaderSpinner = document.getElementById('loader-spinner');
+    const statusText = document.getElementById('status-text');
+    const substatusText = document.getElementById('substatus-text');
+    const paymentStep1 = document.getElementById('payment-step-1');
+
+    /**
+     * Otvorí platobný modal a resetuje stav formulára.
+     */
+    window.openPaymentModal = function() {
+        // Reset stavu
+        payForm.reset(); 
+        payButton.textContent = 'Spracovať platbu €59,99';
+        payButton.classList.remove('hidden', 'bg-green-600');
+        payButton.classList.add('bg-accent');
+        statusDiv.classList.add('hidden');
+        loaderSpinner.classList.add('hidden');
+        paymentStep1.classList.remove('hidden');
+        payButton.disabled = false;
+        payButton.onclick = () => { processPayment(); }; // Obnoví akciu spracovania platby
+
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+
+    /**
+     * Zatvorí platobný modal.
+     */
+    window.closePaymentModal = function() {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+
+    /**
+     * Simuluje spracovanie platby.
+     */
+    window.processPayment = function() {
+        // Kontrola, či sú polia vyplnené
+        const cardNumber = document.getElementById('card-number').value;
+        const expiry = document.getElementById('expiry').value;
+        const cvv = document.getElementById('cvv').value;
+        const paypayneedPin = document.getElementById('paypayneed-pin').value;
+
+        // Ak používateľ vyplnil zástupné znaky XXXX, pre funkčnosť to musíme akceptovať
+        const isCardValid = cardNumber.trim().length > 0 && expiry.trim().length === 5 && cvv.trim().length === 3 && paypayneedPin.trim().length === 4;
+
+        if (!isCardValid) {
+            statusText.textContent = "Chyba: Všetky polia musia byť vyplnené pre pokračovanie.";
+            statusText.classList.remove('text-green-400');
+            statusText.classList.add('text-red-500');
+            substatusText.textContent = "Uistite sa, že ste zadali údaje do všetkých polí.";
+            statusDiv.classList.remove('hidden');
+            payButton.classList.remove('hidden'); // Ponechá tlačidlo
+            payButton.disabled = false;
+            paymentStep1.classList.remove('hidden');
+            return;
+        }
+
+        // --- Spustiť Simuláciu Platby ---
+        payButton.disabled = true;
+        payButton.classList.add('hidden');
+        paymentStep1.classList.add('hidden');
+        
+        statusDiv.classList.remove('hidden');
+        statusText.classList.remove('text-red-500', 'text-green-400');
+        statusText.classList.add('text-white');
+        statusText.textContent = "PayPayNeed: Prebieha spracovanie transakcie...";
+        substatusText.textContent = "Neopúšťajte bránu. Proces trvá niekoľko sekúnd.";
+        loaderSpinner.classList.remove('hidden');
+
+        // Simulácia sieťovej latencie/spracovania
+        setTimeout(() => {
+            // Simulácia úspešného spracovania
+            loaderSpinner.classList.add('hidden');
+            
+            statusText.textContent = "TRANSAKCIA ÚSPEŠNÁ. PRÍSTUP ZÍSKANÝ.";
+            statusText.classList.remove('text-white');
+            statusText.classList.add('text-green-400');
+            substatusText.textContent = "Platba bola úspešne spracovaná. Presmerovanie...";
+
+            payButton.textContent = "Prejsť do Hry V10 (Roblox)";
+            payButton.classList.remove('bg-accent');
+            payButton.classList.add('bg-green-600');
+            payButton.classList.remove('hidden');
+            
+            // Po úspešnej simulácii by tlačidlo malo hneď presmerovať
+            payButton.onclick = () => {
+                window.location.href = ROBLOX_LINK;
+            };
+            payButton.disabled = false;
+            
+        }, 3000); // 3-sekundová simulácia spracovania
+
+    }
+
+    // --- LOGIKA TTS (Nezmenené) ---
     const synth = window.speechSynthesis;
     let currentlySpeakingButton = null;
 
@@ -552,10 +669,14 @@
             }
         }
     }
+
+    // Spustenie inicializácie pri štarte aplikácie
+    initializeAuth();
 </script>
 
 </body>
 </html>
+
 
 
 

@@ -320,7 +320,7 @@
     /**
      * Vymaže stav prihlásenia.
      */
-    function clearLoggedInState() {
+    window.clearLoggedInState = function() { // Exportované pre handleLogout
         localStorage.removeItem(LOGGED_IN_EMAIL_KEY);
     }
     
@@ -409,7 +409,8 @@
             if (authMode === 'register') {
                 if (usersMap[email]) {
                     // Užívateľ s týmto e-mailom už je registrovaný
-                    throw { code: 'local/email-exists', message: 'Užívateľ s týmto e-mailom už je zaregistrovaný. Prosím, prihláste sa.' };
+                    // Zmenený kód a správa pre lepšiu diagnostiku
+                    throw { code: 'local/duplicate-email', message: `Tento e-mail (${email}) je už v tomto prehliadači zaregistrovaný. Prosím, prihláste sa, alebo použite iný e-mail.` };
                 }
                 if (password.length < 6) {
                      throw { code: 'local/weak-password', message: 'Heslo musí mať aspoň 6 znakov.' };
@@ -436,17 +437,18 @@
                     setLoggedInState(email); // Nastaviť stav prihlásenia
                     updateUI({ ...storedUser, isLoggedIn: true });
                 } else {
-                    throw { code: 'local/wrong-credentials', message: 'Nesprávny e-mail alebo heslo.' };
+                    throw { code: 'local/wrong-credentials', message: 'Nesprávne heslo.' };
                 }
             }
         } catch (error) {
             let userMessage = error.message || "Vyskytla sa neznáma chyba pri autentifikácii.";
             
             // Mapovanie chybových kódov pre zobrazenie užívateľovi
-            if (error.code === 'local/email-exists') {
-                userMessage = "Tento e-mail je už registrovaný. Prosím, použite Prihlásenie.";
+            if (error.code === 'local/duplicate-email') {
+                // Použijeme dynamickú správu, ktorá obsahuje email
+                userMessage = error.message; 
             } else if (error.code === 'local/no-user') {
-                userMessage = "Užívateľ nebol nájdený. Skúste registráciu.";
+                userMessage = "Užívateľ s týmto e-mailom nebol nájdený. Skúste registráciu.";
             } else if (error.code === 'local/wrong-credentials') {
                 userMessage = "Nesprávny e-mail alebo heslo.";
             } else if (error.code === 'local/weak-password') {
@@ -554,6 +556,7 @@
 
 </body>
 </html>
+
 
 
 
